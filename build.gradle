@@ -1,0 +1,45 @@
+// Equivalent to groupid and version in maven, artifactid equivalent is set in settings.gradle.
+group 'com.szadowsz'
+version '0.0.1'
+
+apply plugin: 'java'
+apply plugin: 'scala'
+// IntelliJ is the primary development medium, so it makes sense to add explicit support for all the sub-modules
+apply plugin: 'idea'
+
+    ext {
+        scalaVersion = '2.11.8'
+        sparkVersion = '2.0.0'
+        scalaTestVersion = '2.2.4'
+        slf4jVersion = '1.7.12'
+        junitVersion = '4.11'
+        seleniumVersion = '2.52.0'
+    }
+
+
+    idea {
+	    module {
+            downloadJavadoc = true
+            downloadSources = true
+        }
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+
+/*
+ * Dependencies of the current system. Important dependencies for interops between scala and java are: scala compiler,
+ * slf4j logger, scalatest and junit.
+ */
+dependencies {
+    compile project(':module/phobail')
+    compile group: 'org.seleniumhq.selenium', name: 'selenium-htmlunit-driver', version: seleniumVersion
+    //compile group: 'org.seleniumhq.selenium', name: 'selenium-firefox-driver', version: seleniumVersion
+    compile group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: seleniumVersion
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.9.2'
+
+    testCompile group: 'org.scalatest', name: 'scalatest_2.11', version: scalaTestVersion
+    testCompile group: 'junit', name: 'junit', version: junitVersion
+}
