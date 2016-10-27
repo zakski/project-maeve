@@ -1,17 +1,18 @@
+# Covers IntelliJ, Gradle, and Scala
+
+# Do not add user-specific sensitive/high-churn Intellij files
+.idea/
+
+# Do not add user-specific Gradle data and configuration
+.gradle/
+
+# Do not add user-specific Gradle Wrapper information
+gradle/
+gradlew
+gradlew.bat
+
+# Do not add local builds to git
+build/
+
+# Do not add complied jvm code to git
 *.class
-*.log
-
-# sbt specific
-.cache
-.history
-.lib/
-dist/*
-target/
-lib_managed/
-src_managed/
-project/boot/
-project/plugins/project/
-
-# Scala-IDE specific
-.scala_dependencies
-.worksheet
