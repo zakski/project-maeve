@@ -54,7 +54,7 @@ class GgleTopicScraper(private val link: String, private val dir: String, privat
     logger.info(s"Discovered ${topics.length} Topics")
     val target = FragmentTarget(urlBase, topics)
     val filter = new GrpTopicsExtractor()
-    val actions = new WaitExecutor
+    val actions = new WaitExecutor(5000)
 
     val instruction = MaeveInstruction(group, target, actions, filter, groupDir, false, !deltaMode, MaeveConf().setNoProxy())
 
