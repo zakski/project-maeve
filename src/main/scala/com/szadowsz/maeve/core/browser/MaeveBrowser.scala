@@ -8,6 +8,9 @@ import org.openqa.selenium.WebDriver
 import org.w3c.{dom => w3c}
 
 /**
+  * Trait to cover both Headless and Chrome driver situations. While Headless is preferable from a resource perspective, certain things are impossible to
+  * scrape without a physical browser; particularly web pages heavily reliant on Ajax calls.
+  *
   * Created on 16/10/2016.
   */
 trait MaeveBrowser extends WebDriver {

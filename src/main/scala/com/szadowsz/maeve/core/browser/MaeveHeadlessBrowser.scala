@@ -6,7 +6,7 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver
 import org.w3c.{dom => w3c}
 
 /**
-  * Extension of Selenium web browser to allow for a bigger variety of page formats to be returned and configuration options applied.
+  * Extension of Htmlunit web browser to allow for a bigger variety of page formats to be returned and configuration options applied.
   *
   * Created on 13/05/2016.
   */
@@ -83,7 +83,7 @@ class MaeveHeadlessBrowser(private val conf: MaeveConf) extends HtmlUnitDriver(c
   def getHistory: History = getWindow.getHistory
 
   /**
-    * Function to clear all broswer history.
+    * Function to clear all browser history.
     */
   override def clearHistory(): Unit = {
     val hist = getHistory

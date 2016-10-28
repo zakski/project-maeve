@@ -5,7 +5,7 @@ import java.util.Calendar
 
 import com.szadowsz.maeve.core.instruction.MaeveInstruction
 import com.szadowsz.maeve.core.instruction.extractor.JsoupExtractor
-import com.szadowsz.maeve.core.instruction.extractor.util.LineDataWriter
+import com.szadowsz.maeve.core.instruction.extractor.util.TxtFileLineWriter
 import com.szadowsz.common.net.Uri
 import org.apache.commons.lang3.StringEscapeUtils
 import org.jsoup.Jsoup
@@ -21,7 +21,7 @@ import scala.util.{Failure, Success, Try}
 /**
   * Created on 18/10/2016.
   */
-class GrpTopicsExtractor() extends JsoupExtractor with LineDataWriter {
+class GrpTopicsExtractor() extends JsoupExtractor with TxtFileLineWriter {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
   val contSettings = new OutputSettings()

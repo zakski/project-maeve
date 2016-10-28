@@ -3,7 +3,7 @@ package com.szadowsz.maeve.core.instruction
 import com.szadowsz.maeve.core.browser.{MaeveBrowser, MaeveConf}
 import com.szadowsz.maeve.core.instruction.actions.ActionExecutor
 import com.szadowsz.maeve.core.instruction.extractor.{DataExtractor, DomExtractor, HtmlExtractor, JsoupExtractor}
-import com.szadowsz.maeve.core.instruction.target.Profile
+import com.szadowsz.maeve.core.instruction.target.Target
 import com.szadowsz.maeve.core.instruction.target.multi.MultiTarget
 import com.szadowsz.maeve.core.instruction.target.multi.feeder.FragmentFeederTarget
 import com.szadowsz.maeve.core.instruction.target.single.SingleTarget
@@ -13,7 +13,7 @@ import com.szadowsz.common.net.Uri
   * Created on 12/10/2016.
   */
 case class MaeveInstruction
-[P <: Profile[P]]
+[P <: Target[P]]
 (
   name: String,
   target: P,
