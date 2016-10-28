@@ -1,6 +1,5 @@
 package com.szadowsz.maeve.core.instruction.target.multi
 
-import com.szadowsz.maeve.core.instruction.target.Target
 import com.szadowsz.common.net.Uri
 
 

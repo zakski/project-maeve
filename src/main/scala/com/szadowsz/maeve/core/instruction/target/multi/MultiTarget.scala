@@ -4,7 +4,7 @@ import com.szadowsz.maeve.core.instruction.target.Target
 import com.szadowsz.common.net.Uri
 
 /**
-  * Trait for the common scenario in which we need to construct and target multiple uris froms ome sequence.
+  * Trait for the common scenario in which we need to construct and target multiple uris from some provided sequence.
   *
   * Created on 16/10/2016.
   */
