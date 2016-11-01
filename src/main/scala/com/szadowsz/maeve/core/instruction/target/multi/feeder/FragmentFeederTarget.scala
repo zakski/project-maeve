@@ -1,3 +1,18 @@
+// Copyright 2016 zakski.
+// See the LICENCE.txt file distributed with this work for additional
+// information regarding copyright ownership.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 package com.szadowsz.maeve.core.instruction.target.multi.feeder
 
 import com.szadowsz.common.net.Uri
@@ -21,14 +36,14 @@ case class FragmentFeederTarget(
     *
     * @return the current uri
     */
-  def currentUrl() = baseUrl.withFragment(seq.head)
+  def currentUrl():Uri = baseUrl.withFragment(seq.head)
 
   /**
     * Method to update the url to the next in sequence.
     *
     * @return the instance, updated to the next target in the sequence
     */
-  def next() = {
+  def next():FragmentFeederTarget = {
     hist += seq.remove(0)
     this
   }
@@ -38,7 +53,7 @@ case class FragmentFeederTarget(
     *
     * @return a version of the target sequence with a cleared history.
     */
-  def reset() = {
+  def reset():FragmentFeederTarget = {
     seq.clear()
     hist.clear()
     this
