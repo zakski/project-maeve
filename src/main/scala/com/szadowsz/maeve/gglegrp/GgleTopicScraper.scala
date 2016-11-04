@@ -39,17 +39,8 @@ class GgleTopicScraper(private val link: String, private val dir: String, privat
   private val group: String = link.substring(link.lastIndexOf("/") + 1)
   private val groupDir: String = dir + s"${group.replaceAll("\\.", "/")}/"
 
-  private def buildConfig(): MaeveConf = {
-    MaeveConf()
-      .setJavaScriptEnabled(true)
-      .setHTTPProxy("proxy", 8080, Nil)
-      .setThrowExceptionOnScriptError(false)
-  }
-
-
   def execute(): Unit = {
-    System.setProperty("webdriver.chrome.driver", ".\\util-tarbh\\chromedriver_win32\\chromedriver.exe")
-    val conf = buildConfig()
+    val conf = MaeveConf()
     val scraper = new MaeveDriver(conf)
     recoveryDir.foreach(p => scraper.setRecoveryDirectory(p))
 

@@ -19,6 +19,7 @@ import org.openqa.selenium.Proxy
 import com.szadowsz.maeve.core.browser.{MaeveBrowser, MaeveConf, MaeveHeadlessBrowser, MaeveRemoteBrowser}
 import com.szadowsz.maeve.core.error.InvalidProxyException
 import com.szadowsz.maeve.core.instruction.MaeveInstruction
+import com.szadowsz.maeve.core.instruction.target.single.SingleTarget
 import com.szadowsz.maeve.core.util.recovery.RecoveryUtil
 import org.slf4j.LoggerFactory
 
@@ -135,7 +136,7 @@ class MaeveDriver(config: MaeveConf) {
 
   def scrapeUsingCurrInstruction(): Unit = {
     logger.info("Scraping Against Current Instruction: {}", instr.name)
-    if (!instr.isDone) {
+    if (!instr.isDone || instr.target.isInstanceOf[SingleTarget]) {
       instr.doBefore(browser)
       do {
         scrapePage()
