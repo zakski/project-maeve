@@ -145,4 +145,9 @@ class MaeveDriver(config: MaeveConf) {
     }
     browser.quit()
   }
+
+  def scrapeUsingInstruction(instruction: MaeveInstruction[_]):Unit = {
+    feedInstruction(instruction)
+    scrapeUsingCurrInstruction()
+  }
 }
