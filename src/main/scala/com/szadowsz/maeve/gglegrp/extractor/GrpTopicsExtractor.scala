@@ -22,6 +22,7 @@ import com.szadowsz.maeve.core.instruction.MaeveInstruction
 import com.szadowsz.maeve.core.instruction.extractor.JsoupExtractor
 import com.szadowsz.maeve.core.instruction.extractor.util.TxtFileLineWriter
 import com.szadowsz.common.net.Uri
+import com.szadowsz.maeve.core.util.JsoupHtmlToPlainText
 import org.apache.commons.lang3.StringEscapeUtils
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document.OutputSettings
@@ -36,16 +37,16 @@ import scala.util.{Failure, Success, Try}
 /**
   * Created on 18/10/2016.
   */
-class GrpTopicsExtractor() extends JsoupExtractor with TxtFileLineWriter {
+case class GrpTopicsExtractor(maxWidth: Int = JsoupHtmlToPlainText.terminalLength * 2) extends JsoupExtractor with TxtFileLineWriter {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
   val contSettings = new OutputSettings()
     .prettyPrint(false)
 
-  def buildFileName(timeElement: Element, fullTitle: String, length: Int = 20): String = {
+  def buildFileName(instr: MaeveInstruction[_], timeElement: Element, fullTitle: String, length: Int = 20): String = {
 
-    val time = Try(new SimpleDateFormat("yyyy-MM-dd").format(new SimpleDateFormat("dd/MM/yyyy").parse(timeElement.text()))) match{
-      case Success (d) =>  d
+    val time = Try(new SimpleDateFormat("yyyy-MM-dd").format(new SimpleDateFormat("dd/MM/yyyy").parse(timeElement.text()))) match {
+      case Success(d) => d
       case Failure(_) =>
         val d = new SimpleDateFormat("dd MMM").parse(timeElement.text())
         val c = Calendar.getInstance()
@@ -54,11 +55,44 @@ class GrpTopicsExtractor() extends JsoupExtractor with TxtFileLineWriter {
     }
 
     val smallTitle = fullTitle.replaceAll("[^a-zA-Z0-9]", "")
-    time + "-" + smallTitle.substring(0, Math.min(smallTitle.length, length))
+    var count = 1
+    var tmp = time + "-" + smallTitle.substring(0, Math.min(smallTitle.length, length))
+    val org = tmp
+    val path = instr.dPath + s"/${tmp.substring(0, 4)}/"
+    while (exists(path, tmp)) {
+      count += 1
+      tmp = org + s"-$count"
+    }
+    tmp
   }
 
+  private def writeContent(instr: MaeveInstruction[_], returnedUrl: Uri, title: String, posts: List[(Element, String, String)]): Unit = {
+    val postDateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy HH:mm:ss zzz")
+    val sortedPosts = posts.sortBy { case (time, user, post) => postDateFormat.parse(time.attr("title")).getTime }
+    val fileName = buildFileName(instr, sortedPosts.head._1, title)
+    logger.info(s"Writing to file $fileName")
+    val content: ArrayBuffer[String] = ArrayBuffer(s"URL: $returnedUrl")
+    content += s"TITLE: $title \n"
+
+    sortedPosts.foreach { case (timeElement, userStr, post) =>
+      content += "----------------------------------------------------------------------------\n"
+      val user = if (userStr.length > 0) userStr else "UNKNOWN"
+      val time = timeElement.attr("title")
+      content += (time + " - " + user + ":")
+
+      var cleanedUp = post
+      do {
+        cleanedUp = cleanedUp.trim
+        cleanedUp = if (cleanedUp.startsWith("\n")) cleanedUp.substring(1) else cleanedUp
+      } while (cleanedUp.startsWith("\n") || cleanedUp.startsWith(" "))
+      content += cleanedUp
+    }
+    write(instr.dPath + s"/${fileName.substring(0, 4)}/", fileName, content.toList, false)
+  }
+
+
   override def extract(queryUrl: Uri, returnedUrl: Uri, instr: MaeveInstruction[_], page: Document): Unit = {
-    val titleElement = page.select("span[id='t-t']").asScala.toList
+    val titleElement = page.select("span[id='t-t']").asScala.toList.headOption
     val timeElements = page.select("span[class='IVILX2C-tb-Q IVILX2C-b-Cb']").asScala.toList
     val contentElements = page.select("div[class='IVILX2C-tb-W'] div[class='IVILX2C-tb-P'][tabindex=0]").asScala.toList
     var userElements = page.select("span[class='IVILX2C-D-a']").asScala.toList.map(_.text())
@@ -66,35 +100,8 @@ class GrpTopicsExtractor() extends JsoupExtractor with TxtFileLineWriter {
     val nonEmpty = titleElement.nonEmpty && timeElements.nonEmpty && contentElements.nonEmpty
 
     if (nonEmpty && timeElements.length == contentElements.length) {
-      val topic = titleElement.head.text()
-      var fileName = buildFileName(timeElements.head, topic)
-      val path = instr.dPath + s"/${fileName.substring(0, 4)}/"
-      var count = 1
-      var tmp = fileName
-      while (exists(path, tmp)) {
-        count += 1
-        tmp = fileName + s"-$count"
-      }
-      fileName = tmp
-      logger.info(s"Writing to file $fileName")
-      val content: ArrayBuffer[String] = ArrayBuffer(s"URL: $returnedUrl")
-      content += s"TITLE: $topic \n"
-
-      contentElements.zipWithIndex.foreach { case (post, i) =>
-        content += "----------------------------------------------------------------------------\n"
-        val user = if (userElements.length > i) userElements(i) else "UNKNOWN"
-        val time = timeElements(i).attr("title")
-        content += (time + " - " + user + ":")
-
-        var cleanedUp = StringEscapeUtils.unescapeHtml4(Jsoup.clean(post.html, "", Whitelist.none(), contSettings)).dropWhile(_ == "\n").toString
-        do {
-          cleanedUp = cleanedUp.trim
-          cleanedUp = if (cleanedUp.startsWith("\n")) cleanedUp.substring(1) else cleanedUp
-        } while (cleanedUp.startsWith("\n") || cleanedUp.startsWith(" "))
-        content += cleanedUp
-      }
-      write(instr.dPath + s"/${fileName.substring(0, 4)}/", fileName, content.toList, false)
-      // }
+      val posts = (timeElements, userElements, contentElements.map(c => JsoupHtmlToPlainText.convertToPlainText(c, maxWidth))).zipped.toList
+      writeContent(instr, returnedUrl, titleElement.get.text(), posts)
     } else {
       throw new Exception("Missing Information")
     }
