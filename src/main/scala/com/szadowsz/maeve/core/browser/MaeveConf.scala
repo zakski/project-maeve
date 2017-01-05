@@ -41,6 +41,8 @@ object MaeveConf {
   val CHROME_DONT_TRACK = "enable_do_not_track"
   val CHROME_PREFS = "prefs"
 
+  val SKIP_TEST_PROXY = "skipProxyTest"
+
 }
 
 /**
@@ -56,6 +58,8 @@ case class MaeveConf(protected val caps: Map[String, AnyRef] = Map()) extends Ca
   override def getCapability(capabilityName: String): AnyRef = caps.get(capabilityName).orNull
 
   override def isJavascriptEnabled: Boolean = caps.getOrElse(MaeveConf.JAVASCRIPT, true).asInstanceOf[Boolean]
+
+  def shouldSkipProxyTest: java.lang.Boolean = caps.getOrElse(MaeveConf.SKIP_TEST_PROXY, false).asInstanceOf[Boolean]
 
   def isUseInsecureSSL: java.lang.Boolean = caps.getOrElse(MaeveConf.INSECURE_SSL, false).asInstanceOf[Boolean]
 
@@ -104,6 +108,8 @@ case class MaeveConf(protected val caps: Map[String, AnyRef] = Map()) extends Ca
   def setUseInsecureSSL(useInsecureSSL: java.lang.Boolean): MaeveConf = copy(caps + (MaeveConf.INSECURE_SSL -> useInsecureSSL))
 
   def setRedirectEnabled(enableRedirect: java.lang.Boolean): MaeveConf = copy(caps + (MaeveConf.ENABLE_REDIRECT -> enableRedirect))
+
+  def setSkipProxyTestEnabled(enable: java.lang.Boolean): MaeveConf = copy(caps + (MaeveConf.SKIP_TEST_PROXY -> enable))
 
   def setCssEnabled(enableCSS: java.lang.Boolean): MaeveConf = copy(caps + (MaeveConf.ENABLE_CSS -> enableCSS))
 

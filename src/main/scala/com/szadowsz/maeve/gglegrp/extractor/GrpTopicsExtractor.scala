@@ -93,8 +93,9 @@ case class GrpTopicsExtractor(maxWidth: Int = JsoupHtmlToPlainText.terminalLengt
 
   override def extract(queryUrl: Uri, returnedUrl: Uri, instr: MaeveInstruction[_], page: Document): Unit = {
     val titleElement = page.select("span[id='t-t']").asScala.toList.headOption
-    val timeElements = page.select("span[class='IVILX2C-tb-Q IVILX2C-b-Cb']").asScala.toList
-    val contentElements = page.select("div[class='IVILX2C-tb-W'] div[class='IVILX2C-tb-P'][tabindex=0]").asScala.toList
+    val timeElements = page.select("span[class='IVILX2C-tb-Q IVILX2C-b-Cb'],span[class='IVILX2C-nb-Q IVILX2C-b-Cb']").asScala.toList
+    val contentElements = page.select("div[class='IVILX2C-tb-W'] div[class='IVILX2C-tb-P'][tabindex=0],div[class='IVILX2C-nb-W'] div[class='IVILX2C-nb-P'][tabindex=0]")
+      .asScala.toList
     var userElements = page.select("span[class='IVILX2C-D-a']").asScala.toList.map(_.text())
 
     val nonEmpty = titleElement.nonEmpty && timeElements.nonEmpty && contentElements.nonEmpty
@@ -103,7 +104,7 @@ case class GrpTopicsExtractor(maxWidth: Int = JsoupHtmlToPlainText.terminalLengt
       val posts = (timeElements, userElements, contentElements.map(c => JsoupHtmlToPlainText.convertToPlainText(c, maxWidth))).zipped.toList
       writeContent(instr, returnedUrl, titleElement.get.text(), posts)
     } else {
-      throw new Exception("Missing Information")
+      throw new Exception(s"Missing Information: Time=${timeElements.length} Contents=${contentElements.length}")
     }
   }
 

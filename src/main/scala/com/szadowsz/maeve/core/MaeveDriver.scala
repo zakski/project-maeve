@@ -46,25 +46,29 @@ class MaeveDriver(config: MaeveConf) {
     * @return the corrected maeve configuration
     */
   private def testProxy(config: MaeveConf): MaeveConf = {
-    val test = new MaeveHeadlessBrowser(config.setJavaScriptEnabled(false))
-    test.get("https://google.com/ncr") // try to connect to google with no country specific redirect for consistency
-    val result = Try(test.getPageAsHtml.getUrl.toString)
+    if (!config.shouldSkipProxyTest) {
+      val test = new MaeveHeadlessBrowser(config.setJavaScriptEnabled(false))
+      test.get("https://google.com/ncr") // try to connect to google with no country specific redirect for consistency
+      val result = Try(test.getPageAsHtml.getUrl.toString)
 
-    // should return a basic google.com address
-    if (result.isSuccess && result.get == "https://www.google.com/") {
-      logger.info("Proxy configured correctly")
-      config
-    } else {
-      val proxy = config.getProxy
-      if (proxy.getProxyAutoconfigUrl != null) {
-        logger.error("Invalid Proxy Auto Configuration URL detected: {}, Reconfiguring...", proxy.getProxyAutoconfigUrl)
-        testProxy(config.setNoProxy())
-      } else if (proxy.getHttpProxy != null) {
-        logger.error("Invalid Http Proxy detected: {}, Reconfiguring...", proxy.getHttpProxy)
-        testProxy(config.setNoProxy())
+      // should return a basic google.com address
+      if (result.isSuccess && result.get == "https://www.google.com/") {
+        logger.info("Proxy configured correctly")
+        config
       } else {
-        throw new InvalidProxyException()
+        val proxy = config.getProxy
+        if (proxy.getProxyAutoconfigUrl != null) {
+          logger.error("Invalid Proxy Auto Configuration URL detected: {}, Reconfiguring...", proxy.getProxyAutoconfigUrl)
+          testProxy(config.setNoProxy())
+        } else if (proxy.getHttpProxy != null) {
+          logger.error("Invalid Http Proxy detected: {}, Reconfiguring...", proxy.getHttpProxy)
+          testProxy(config.setNoProxy())
+        } else {
+          throw new InvalidProxyException()
+        }
       }
+    } else {
+      config
     }
   }
 
