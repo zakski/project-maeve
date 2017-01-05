@@ -58,7 +58,7 @@ object Uri {
     val jURI = new URI(PercentEncoder.encode(str))
     val scheme = Option(jURI.getScheme)
     val (user, pass) = parseUserInfo(Option(jURI.getUserInfo))
-    val host = Option(jURI.getHost)
+    val host = Option(jURI.getHost).orElse(Option(jURI.getAuthority))
     val port = if (jURI.getPort < 0) None else Option(jURI.getPort)
     val jPath = jURI.getPath
     val path = parsePath(if (jPath != null && jPath.length > 0) Option(jPath) else None)
