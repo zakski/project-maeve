@@ -37,6 +37,7 @@ case class MaeveInstruction
   dPath: String,
   isHeadless: Boolean = true,
   recovEnabled: Boolean = true,
+  hasTimeouts : Boolean = false,
   conf: MaeveConf = MaeveConf()
 ) {
 

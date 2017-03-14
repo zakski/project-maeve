@@ -15,6 +15,8 @@
 // limitations under the License.
 package com.szadowsz.maeve.core
 
+import java.util.concurrent.TimeUnit
+
 import org.openqa.selenium.Proxy
 import com.szadowsz.maeve.core.browser.{MaeveBrowser, MaeveConf, MaeveHeadlessBrowser, MaeveRemoteBrowser}
 import com.szadowsz.maeve.core.error.InvalidProxyException
@@ -32,12 +34,12 @@ import scala.util.control.NonFatal
 class MaeveDriver(config: MaeveConf) {
   private val logger = LoggerFactory.getLogger(classOf[MaeveDriver])
 
-  private val defaultConf = testProxy(config)
+  protected val defaultConf = testProxy(config)
 
-  private var recovPath: String = "./recovery/"
+  protected var recovPath: String = "./recovery/"
 
-  private var browser: MaeveBrowser = _
-  private var instr: MaeveInstruction[_] = _
+  protected var browser: MaeveBrowser = _
+  protected var instr: MaeveInstruction[_] = _
 
   /**
     * Method to Check the proxy configuration is valid, and attempt to fix it if it is not.
@@ -45,30 +47,26 @@ class MaeveDriver(config: MaeveConf) {
     * @param config the default maeve configuration
     * @return the corrected maeve configuration
     */
-  private def testProxy(config: MaeveConf): MaeveConf = {
-    if (!config.shouldSkipProxyTest) {
-      val test = new MaeveHeadlessBrowser(config.setJavaScriptEnabled(false))
-      test.get("https://google.com/ncr") // try to connect to google with no country specific redirect for consistency
-      val result = Try(test.getPageAsHtml.getUrl.toString)
+  protected def testProxy(config: MaeveConf): MaeveConf = {
+    val test = new MaeveHeadlessBrowser(config.setJavaScriptEnabled(false))
+    test.get("https://google.com/ncr") // try to connect to google with no country specific redirect for consistency
+    val result = Try(test.getPageAsHtml.getUrl.toString)
 
-      // should return a basic google.com address
-      if (result.isSuccess && result.get == "https://www.google.com/") {
-        logger.info("Proxy configured correctly")
-        config
-      } else {
-        val proxy = config.getProxy
-        if (proxy.getProxyAutoconfigUrl != null) {
-          logger.error("Invalid Proxy Auto Configuration URL detected: {}, Reconfiguring...", proxy.getProxyAutoconfigUrl)
-          testProxy(config.setNoProxy())
-        } else if (proxy.getHttpProxy != null) {
-          logger.error("Invalid Http Proxy detected: {}, Reconfiguring...", proxy.getHttpProxy)
-          testProxy(config.setNoProxy())
-        } else {
-          throw new InvalidProxyException()
-        }
-      }
-    } else {
+    // should return a basic google.com address
+    if (result.isSuccess && result.get == "https://www.google.com/") {
+      logger.info("Proxy configured correctly")
       config
+    } else {
+      val proxy = config.getProxy
+      if (proxy.getProxyAutoconfigUrl != null) {
+        logger.error("Invalid Proxy Auto Configuration URL detected: {}, Reconfiguring...", proxy.getProxyAutoconfigUrl)
+        testProxy(config.setNoProxy())
+      } else if (proxy.getHttpProxy != null) {
+        logger.error("Invalid Http Proxy detected: {}, Reconfiguring...", proxy.getHttpProxy)
+        testProxy(config.setNoProxy())
+      } else {
+        throw new InvalidProxyException()
+      }
     }
   }
 
@@ -92,12 +90,19 @@ class MaeveDriver(config: MaeveConf) {
 
     instr = ffInstr
   }
+  private def wrap(browser : MaeveBrowser, bf : (MaeveBrowser) => Unit) = {
+    try {
+      bf(browser)
+    } catch {
+      case NonFatal(e) =>
+    }
+  }
 
   protected def pullPage(): Unit = {
     val page = instr.getCurrentUrl.toString
     if (browser.getCurrentUrl != page) {
       logger.info("Retrieving Page: {}", page)
-      browser.get(page)
+      if (instr.hasTimeouts) {wrap(browser,b => b.get(page))} else {browser.get(page)}
       logger.info("Retrieved Page: {}", browser.getTitle)
       instr.doInitialAction(browser)
     }
@@ -127,7 +132,7 @@ class MaeveDriver(config: MaeveConf) {
             tries += 1
             logger.error("Failed to Extract Data", e)
             browser.navigate().refresh()
-            Thread.sleep(5000)
+            Thread.sleep(1000)
           } else {
             throw e
           }
@@ -153,6 +158,7 @@ class MaeveDriver(config: MaeveConf) {
 
   def scrapeUsingInstruction(instruction: MaeveInstruction[_]):Unit = {
     feedInstruction(instruction)
+    if (instruction.hasTimeouts) {browser.manage().timeouts().pageLoadTimeout(15,TimeUnit.SECONDS)}
     scrapeUsingCurrInstruction()
   }
 }

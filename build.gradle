@@ -2,14 +2,29 @@
 group 'com.szadowsz'
 version '0.0.1'
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+    }
+}
+
+// IntelliJ is the primary development medium, so it makes sense to add explicit support for it in gradle
+apply plugin: 'idea'
+
+// Add distribution support
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+// Add necessary language support
 apply plugin: 'java'
 apply plugin: 'scala'
-// IntelliJ is the primary development medium, so it makes sense to add explicit support for all the sub-modules
-apply plugin: 'idea'
 
     ext {
         scalaVersion = '2.11.8'
-        sparkVersion = '2.0.0'
         scalaTestVersion = '2.2.4'
         slf4jVersion = '1.7.12'
         junitVersion = '4.11'
@@ -26,6 +41,9 @@ apply plugin: 'idea'
 
     repositories {
         mavenCentral()
+        maven {
+            url 'http://dl.bintray.com/zakski/default'
+        }
     }
 
 
@@ -34,7 +52,7 @@ apply plugin: 'idea'
  * slf4j logger, scalatest and junit.
  */
 dependencies {
-    compile project(':module/phobail')
+    compile group: 'com.szadowsz', name: 'an-phobail', version: '0.0.1'
     compile group: 'org.seleniumhq.selenium', name: 'selenium-htmlunit-driver', version: seleniumVersion
     //compile group: 'org.seleniumhq.selenium', name: 'selenium-firefox-driver', version: seleniumVersion
     compile group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: seleniumVersion
@@ -42,4 +60,33 @@ dependencies {
 
     testCompile group: 'org.scalatest', name: 'scalatest_2.11', version: scalaTestVersion
     testCompile group: 'junit', name: 'junit', version: junitVersion
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    //  configurations = ['archives']
+    publications = ['maven']
+    pkg {
+        repo = 'default'
+        name = 'maeve'
+        userOrg = user
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/zakski/project-maeve.git'
+        githubRepo ='zakski/project-maeve'
+        publicDownloadNumbers = false
+        version {
+            name = '0.0.1-snapshot'
+            desc = 'Common Webscraper Functions 0.0.1'
+            vcsTag = '0.0.1'
+        }
+    }
 }
