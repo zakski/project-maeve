@@ -62,7 +62,7 @@ class GgleTopicScraper(private val link: String, private val dir: String, privat
     val filter = new GrpTopicsExtractor()
     val actions = new WaitExecutor(5000)
 
-    val instruction = MaeveInstruction(group, target, actions, filter, groupDir, false, !deltaMode, MaeveConf().setNoProxy())
+    val instruction = MaeveInstruction(group, target, actions, filter, groupDir, false, !deltaMode, false, MaeveConf().setNoProxy())
 
     scraper.feedInstruction(instruction)
     scraper.scrapeUsingCurrInstruction()
