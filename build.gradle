@@ -1,6 +1,6 @@
 // Equivalent to groupid and version in maven, artifactid equivalent is set in settings.gradle.
 group 'com.szadowsz'
-version '0.0.2'
+version '0.0.3'
 
 buildscript {
     repositories {
@@ -52,7 +52,7 @@ apply plugin: 'scala'
  * slf4j logger, scalatest and junit.
  */
 dependencies {
-    compile group: 'com.szadowsz', name: 'an-phobail', version: '0.0.3'
+    compile group: 'com.szadowsz', name: 'an-phobail', version: '0.0.4'
     compile group: 'org.seleniumhq.selenium', name: 'selenium-htmlunit-driver', version: seleniumVersion
     //compile group: 'org.seleniumhq.selenium', name: 'selenium-firefox-driver', version: seleniumVersion
     compile group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: seleniumVersion
@@ -84,9 +84,9 @@ bintray {
         githubRepo ='zakski/project-maeve'
         publicDownloadNumbers = false
         version {
-            name = '0.0.2-snapshot'
-            desc = 'Common Webscraper Functions 0.0.2'
-            vcsTag = '0.0.2'
+            name = '0.0.3-snapshot'
+            desc = 'Common Webscraper Functions 0.0.3'
+            vcsTag = '0.0.3'
         }
     }
 }
