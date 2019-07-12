@@ -1,13 +1,13 @@
 // Equivalent to groupid and version in maven, artifactid equivalent is set in settings.gradle.
 group 'com.szadowsz'
-version '0.0.3'
+version '1.0.0'
 
 buildscript {
     repositories {
         jcenter()
     }
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
     }
 }
 
@@ -24,13 +24,12 @@ apply plugin: 'java'
 apply plugin: 'scala'
 
     ext {
-        scalaVersion = '2.11.8'
-        scalaTestVersion = '2.2.4'
-        slf4jVersion = '1.7.12'
+        scalaVersion = '2.12.8'
+        scalaTestVersion = '3.0.8'
+        slf4jVersion = '1.7.26'
         junitVersion = '4.11'
-        seleniumVersion = '2.52.0'
+        seleniumVersion = '3.141.59'
     }
-
 
     idea {
 	    module {
@@ -52,13 +51,13 @@ apply plugin: 'scala'
  * slf4j logger, scalatest and junit.
  */
 dependencies {
-    compile group: 'com.szadowsz', name: 'an-phobail', version: '0.0.4'
-    compile group: 'org.seleniumhq.selenium', name: 'selenium-htmlunit-driver', version: seleniumVersion
+    compile group: 'com.szadowsz', name: 'an-phobail', version: '1.0.0'
+    compile group: 'org.seleniumhq.selenium', name: 'htmlunit-driver', version: '2.35.1'
     //compile group: 'org.seleniumhq.selenium', name: 'selenium-firefox-driver', version: seleniumVersion
     compile group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: seleniumVersion
-    compile group: 'org.jsoup', name: 'jsoup', version: '1.9.2'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
 
-    testCompile group: 'org.scalatest', name: 'scalatest_2.11', version: scalaTestVersion
+    testCompile group: 'org.scalatest', name: 'scalatest_2.12', version: scalaTestVersion
     testCompile group: 'junit', name: 'junit', version: junitVersion
 }
 
@@ -66,6 +65,9 @@ publishing {
     publications {
         maven(MavenPublication) {
             from components.java
+            groupId 'com.szadowsz'
+            artifactId 'maeve'
+            version '1.0.0'
         }
     }
 }
@@ -84,9 +86,9 @@ bintray {
         githubRepo ='zakski/project-maeve'
         publicDownloadNumbers = false
         version {
-            name = '0.0.3-snapshot'
-            desc = 'Common Webscraper Functions 0.0.3'
-            vcsTag = '0.0.3'
+            name = '1.0.0-snapshot'
+            desc = 'Common Webscraper Functions 1.0.0'
+            vcsTag = '1.0.0'
         }
     }
 }

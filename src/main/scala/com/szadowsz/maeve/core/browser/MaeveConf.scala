@@ -129,7 +129,7 @@ case class MaeveConf(protected val caps: Map[String, AnyRef] = Map()) extends Ca
 
   def setActiveXNative(enableActiveXNative: java.lang.Boolean): MaeveConf = copy(caps + (MaeveConf.ENABLE_NATIVE_ACTIVEX -> enableActiveXNative))
 
-  override def asMap(): util.Map[String, _] = caps.asJava
+  override def asMap(): util.Map[String, Object] = caps.asJava
 
   def overrideConf(defaultConf : MaeveConf): MaeveConf = {
     caps.foldLeft(defaultConf){case (conf,(key,value)) => conf.setCapability(key,value)}
