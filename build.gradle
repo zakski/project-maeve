@@ -1,6 +1,6 @@
 // Equivalent to groupid and version in maven, artifactid equivalent is set in settings.gradle.
 group 'com.szadowsz'
-version '1.0.0'
+version '1.0.1'
 
 buildscript {
     repositories {
@@ -67,7 +67,7 @@ publishing {
             from components.java
             groupId 'com.szadowsz'
             artifactId 'maeve'
-            version '1.0.0'
+            version '1.0.1'
         }
     }
 }
@@ -86,9 +86,9 @@ bintray {
         githubRepo ='zakski/project-maeve'
         publicDownloadNumbers = false
         version {
-            name = '1.0.0-snapshot'
-            desc = 'Common Webscraper Functions 1.0.0'
-            vcsTag = '1.0.0'
+            name = '1.0.1-snapshot'
+            desc = 'Common Webscraper Functions 1.0.1'
+            vcsTag = '1.0.1'
         }
     }
 }
